@@ -13,10 +13,17 @@ jobs:
       - name: Attach repository
         uses: actions/checkout@v1
 
-      - name: test
-        run: pwd
-        working-directory: ./.github/build
-
-
-      - run: ls
-        working-directory: ./.github/build
+      
+      - name: Add variables to environment 
+        run: |
+          echo "::set-env name=PACKAGE_VERSION::$(node -v)"
+          echo "::set-env name=LABEL::${GITHUB_RUN_ID}-v${PACKAGE_VERSION}-${GITHUB_SHA}"
+          echo "::set-env name=ZIP_LABEL::v${PACKAGE_VERSION}_${GITHUB_SHA}"
+          echo "::set-env name=WA_ACCOUNT_PACKAGE_VERSION::$(npm -v)-$PACKAGE_VERSION"
+      - name: tets availability
+        run: |
+          echo $PACKAGE_VERSION
+          echo $LABEL
+          echo $ZIP_LABEL
+          echo $WA_ACCOUNT_PACKAGE_VERSION
+          
