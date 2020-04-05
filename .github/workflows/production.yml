@@ -13,6 +13,8 @@ jobs:
       - name: Attach repository
         uses: actions/checkout@v1
 
+      - run: echo $GITHUB_WORKSPACE
+      - run: echo ${GITHUB_WORKSPACE}
       
       - name: Add variables to environment 
         run: |
