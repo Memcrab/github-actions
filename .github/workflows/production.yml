@@ -26,4 +26,14 @@ jobs:
           echo $LABEL
           echo $ZIP_LABEL
           echo $WA_ACCOUNT_PACKAGE_VERSION
-          
+
+  build2:  
+    name: Building2
+    runs-on: ubuntu-latest
+
+    steps:  
+      - run: |
+          echo $PACKAGE_VERSION
+          echo $LABEL
+          echo $ZIP_LABEL
+          echo $WA_ACCOUNT_PACKAGE_VERSION
