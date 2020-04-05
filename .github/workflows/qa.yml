@@ -1,0 +1,90 @@
+name: Master branch
+on:
+  push:
+    branches:
+      - qa
+
+jobs:
+  build:
+    name: Building
+    runs-on: ubuntu-latest
+
+    steps:
+      #https://stackoverflow.com/questions/58033366/how-to-get-current-branch-within-github-actions#comment102508135_58034787
+      - name: Extract branch name
+        shell: bash
+        run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
+
+      - name: Attach repository
+        uses: actions/checkout@v1
+
+      - name: Attach docker image
+        uses: docker://memcrab/npm:12.8
+
+      - name: Install dependencies
+        run: |
+          node --version
+          npm --version
+          npm install
+
+      - name: Build gulp
+        run: |
+          ./node_modules/.bin/gulp build-all
+
+      - name: Set build version
+        run: |
+          ./.github/gitconfig.sh
+          ./.github/setBuildNumber.sh
+
+      - name: Creating NPM artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: artifact-dist
+          path: ./dist
+
+  testing:
+    name: Testing
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Test command need to be here
+        run: echo "get data from worksapce and run testing process"
+
+  deploy-qa:
+    name: deploy-qa
+    runs-on: ubuntu-latest
+    needs: testing
+
+    env:
+      projectPath: /var/www/wallex.asia
+      deployUser: ec2-user
+      deployHost: ec2-52-11-56-185.us-west-2.compute.amazonaws.com
+      robots: ./build/disallow.robots.txt
+      branchName: qa
+
+    steps:
+      - name: Attach repository
+        uses: actions/checkout@v1
+
+      - name: Attaching to NPM artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: artifact-dist
+
+      - name: Search Engine Robots instructions
+        run: |
+          mkdir -p ./dist/
+          cp $robots ./dist/robots.txt
+
+      - name: Copy ssh credentials
+        run: ./.github/ssh.sh
+
+      - name: Deploy code
+        run: ./.github/deploy.sh
+
+      - name: Link last build
+        run: ./.github/link.sh
+
+      - name: Rerun web process
+        run: ./.github/rerun.sh

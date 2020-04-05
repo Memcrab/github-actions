@@ -1,0 +1,22 @@
+name: Master branch
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Building
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Attach repository
+        uses: actions/checkout@v1
+
+      - name: test
+        run: pwd
+        working-directory: ./.github/build
+
+
+      - run: ls
+        working-directory: ./.github/build
